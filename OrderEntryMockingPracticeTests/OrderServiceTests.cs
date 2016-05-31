@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using NSubstitute;
-using NSubstitute.Core;
 using NUnit.Framework;
 using OrderEntryMockingPractice.Models;
 using OrderEntryMockingPractice.Services;
@@ -15,12 +14,15 @@ namespace OrderEntryMockingPracticeTests
         private Order _order;
 
         private IProductRepository _productRepository;
+        private IOrderFulfillmentService _orderFulfillmentService;
 
         [SetUp]
         public void Init()
         {
             _productRepository = Substitute.For<IProductRepository>();
-            _orderService = new OrderService(_productRepository);
+            _orderFulfillmentService = Substitute.For<IOrderFulfillmentService>();
+
+            _orderService = new OrderService(_productRepository, _orderFulfillmentService);
         }
 
         [Test]
@@ -81,6 +83,21 @@ namespace OrderEntryMockingPracticeTests
             //Act and Assert
             var ex = Assert.Throws<InvalidOperationException>(() => _orderService.PlaceOrder(order));
             Assert.That(ex.Message, Is.EqualTo("SKUs are not unique, A product is out of stock"));
+        }
+
+        [Test]
+        public void ValidOrder_SubmitsOrder_ToOrderFullfillmentService()
+        {
+            //Arrange
+            var product = new Product() { Sku = "OutOfStock" };
+            var order = GenerateOneProductOrder(product);
+            _productRepository.IsInStock(product.Sku).Returns(true);
+
+            //Act
+            _orderService.PlaceOrder(order);
+
+            //Assert
+            _orderFulfillmentService.Received().Fulfill(order);
         }
 
         private static Order GenerateOneProductOrder(Product product)

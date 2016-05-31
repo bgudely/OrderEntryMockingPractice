@@ -8,10 +8,12 @@ namespace OrderEntryMockingPractice.Services
     public class OrderService
     {
         private readonly IProductRepository _productRepository;
+        private IOrderFulfillmentService _orderFulfillmentService;
 
-        public OrderService(IProductRepository productRepository)
+        public OrderService(IProductRepository productRepository, IOrderFulfillmentService orderFulfillmentService)
         {
             _productRepository = productRepository;
+            _orderFulfillmentService = orderFulfillmentService;
         }
 
         public OrderSummary PlaceOrder(Order order)
