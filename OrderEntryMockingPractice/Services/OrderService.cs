@@ -7,7 +7,7 @@ namespace OrderEntryMockingPractice.Services
 {
     public class OrderService
     {
-        private IProductRepository _productRepository;
+        private readonly IProductRepository _productRepository;
 
         public OrderService(IProductRepository productRepository)
         {
@@ -29,9 +29,14 @@ namespace OrderEntryMockingPractice.Services
             {
                 throw new InvalidOperationException("SKUs are not unique");
             }
+
+            if (AreProductsInStock(order, _productRepository) == false)
+            {
+                throw new InvalidOperationException("A product is out of stock");
+            }
         }
 
-        private bool AreSkusUnique(Order order)
+        private static bool AreSkusUnique(Order order)
         {
             var numberOfItemsInOrder = order.OrderItems.Count;
             var skuList = order.OrderItems
@@ -45,6 +50,19 @@ namespace OrderEntryMockingPractice.Services
             }
 
             return false;
+        }
+
+        private static bool AreProductsInStock(Order order, IProductRepository productRepository)
+        {
+            foreach (var item in order.OrderItems)
+            {
+                if (!productRepository.IsInStock(item.Product.Sku))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

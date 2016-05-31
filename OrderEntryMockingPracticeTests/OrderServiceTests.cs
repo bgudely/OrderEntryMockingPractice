@@ -80,7 +80,7 @@ namespace OrderEntryMockingPracticeTests
             Assert.Throws<InvalidOperationException>(() => _orderService.PlaceOrder(order));
         }
 
-        private Order GenerateOneProductOrder(Product product)
+        private static Order GenerateOneProductOrder(Product product)
         {
             var orderItem = new OrderItem()
             {
