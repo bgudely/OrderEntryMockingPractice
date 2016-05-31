@@ -8,7 +8,7 @@ namespace OrderEntryMockingPractice.Services
     public class OrderService
     {
         private readonly IProductRepository _productRepository;
-        private IOrderFulfillmentService _orderFulfillmentService;
+        private readonly IOrderFulfillmentService _orderFulfillmentService;
 
         public OrderService(IProductRepository productRepository, IOrderFulfillmentService orderFulfillmentService)
         {
@@ -60,12 +60,7 @@ namespace OrderEntryMockingPractice.Services
                 .Distinct()
                 .ToList();
 
-            if (skuList.Count == numberOfItemsInOrder)
-            {
-                return true;
-            }
-
-            return false;
+            return skuList.Count == numberOfItemsInOrder;
         }
 
         private static bool ProductsAreInStock(Order order, IProductRepository productRepository)
