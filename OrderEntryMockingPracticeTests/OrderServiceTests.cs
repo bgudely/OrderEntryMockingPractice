@@ -39,25 +39,7 @@ namespace OrderEntryMockingPracticeTests
         public void DuplicateSkus_ThrowsException()
         {
             //Arrange
-            var productOne = new Product()
-            {
-                Sku = "123456"
-            };
-            var productTwo = productOne;
-            var order = new Order();
-
-            Product[] products = {productOne, productTwo};
-
-            foreach (var product in products)
-            {
-                var orderItem = new OrderItem()
-                {
-                    Product = product,
-                    Quantity = 2
-                };
-
-                order.OrderItems.Add(orderItem);
-            }
+            var order = GenerateDuplicateSkuOrder();
 
             //Act and Assert
             Assert.Throws<InvalidOperationException>(() => _orderService.PlaceOrder(order));
@@ -88,12 +70,37 @@ namespace OrderEntryMockingPracticeTests
                 Quantity = 1
             };
 
-            var orderItemsList = new List<OrderItem> {orderItem};
+            var orderItemsList = new List<OrderItem> { orderItem };
 
             var order = new Order()
             {
                 OrderItems = orderItemsList
             };
+
+            return order;
+        }
+
+        private static Order GenerateDuplicateSkuOrder()
+        {
+            var productOne = new Product()
+            {
+                Sku = "123456"
+            };
+            var productTwo = productOne;
+            var order = new Order();
+
+            Product[] products = { productOne, productTwo };
+
+            foreach (var product in products)
+            {
+                var orderItem = new OrderItem()
+                {
+                    Product = product,
+                    Quantity = 2
+                };
+
+                order.OrderItems.Add(orderItem);
+            }
 
             return order;
         }
