@@ -6,7 +6,16 @@ namespace OrderEntryMockingPractice.Services
     {
         public OrderSummary PlaceOrder(Order order)
         {
-            return null;
+            ValidateOrder(order);
+
+            var orderSummary = new OrderSummary();
+
+            return orderSummary;
+        }
+
+        public void ValidateOrder(Order order)
+        {
+            
         }
     }
 }
