@@ -25,18 +25,30 @@ namespace OrderEntryMockingPractice.Services
 
         public void ValidateOrder(Order order)
         {
-            if (AreSkusUnique(order) == false)
+            var messages = new List<string>();
+
+            if (order == null)
             {
-                throw new InvalidOperationException("SKUs are not unique");
+                messages.Add("Order is null");
             }
 
-            if (AreProductsInStock(order, _productRepository) == false)
+            if (SkusAreUnique(order) == false)
             {
-                throw new InvalidOperationException("A product is out of stock");
+                messages.Add("SKUs are not unique");
+            }
+
+            if (ProductsAreInStock(order, _productRepository) == false)
+            {
+                messages.Add("A product is out of stock");
+            }
+
+            if (messages.Any())
+            {
+                throw new InvalidOperationException(String.Join(", ", messages));
             }
         }
 
-        private static bool AreSkusUnique(Order order)
+        private static bool SkusAreUnique(Order order)
         {
             var numberOfItemsInOrder = order.OrderItems.Count;
             var skuList = order.OrderItems
@@ -52,7 +64,7 @@ namespace OrderEntryMockingPractice.Services
             return false;
         }
 
-        private static bool AreProductsInStock(Order order, IProductRepository productRepository)
+        private static bool ProductsAreInStock(Order order, IProductRepository productRepository)
         {
             foreach (var item in order.OrderItems)
             {
