@@ -7,6 +7,13 @@ namespace OrderEntryMockingPractice.Services
 {
     public class OrderService
     {
+        private IProductRepository _productRepository;
+
+        public OrderService(IProductRepository productRepository)
+        {
+            _productRepository = productRepository;
+        }
+
         public OrderSummary PlaceOrder(Order order)
         {
             ValidateOrder(order);
@@ -24,7 +31,7 @@ namespace OrderEntryMockingPractice.Services
             }
         }
 
-        public bool AreSkusUnique(Order order)
+        private bool AreSkusUnique(Order order)
         {
             var numberOfItemsInOrder = order.OrderItems.Count;
             var skuList = order.OrderItems

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using NSubstitute;
 using NUnit.Framework;
 using OrderEntryMockingPractice.Models;
 using OrderEntryMockingPractice.Services;
@@ -11,10 +13,13 @@ namespace OrderEntryMockingPracticeTests
         private OrderService _orderService;
         private Order _order;
 
+        private IProductRepository _productRepository;
+
         [SetUp]
         public void Init()
         {
-            _orderService = new OrderService();   
+            _productRepository = Substitute.For<IProductRepository>();
+            _orderService = new OrderService(_productRepository);
         }
 
         [Test]
@@ -56,6 +61,41 @@ namespace OrderEntryMockingPracticeTests
 
             //Act and Assert
             Assert.Throws<InvalidOperationException>(() => _orderService.PlaceOrder(order));
+        }
+
+        [Test]
+        public void ProductOutOfStock_ThrowsException()
+        {
+            //Arrange
+            var product = new Product()
+            {
+                Sku = "OutOfStock"
+            };
+            var order = GenerateOneProductOrder(product);
+
+            //Act
+            _productRepository.IsInStock(product.Sku).Returns(false);
+
+            //Assert
+            Assert.Throws<InvalidOperationException>(() => _orderService.PlaceOrder(order));
+        }
+
+        private Order GenerateOneProductOrder(Product product)
+        {
+            var orderItem = new OrderItem()
+            {
+                Product = product,
+                Quantity = 1
+            };
+
+            var orderItemsList = new List<OrderItem> {orderItem};
+
+            var order = new Order()
+            {
+                OrderItems = orderItemsList
+            };
+
+            return order;
         }
     }
 }
