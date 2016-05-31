@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using OrderEntryMockingPractice.Models;
 using OrderEntryMockingPractice.Services;
 
@@ -27,6 +28,34 @@ namespace OrderEntryMockingPracticeTests
 
             //Assert
             Assert.IsInstanceOf<OrderSummary>(placedOrder);
+        }
+
+        [Test]
+        public void DuplicateSkus_ThrowsException()
+        {
+            //Arrange
+            var productOne = new Product()
+            {
+                Sku = "123456"
+            };
+            var productTwo = productOne;
+            var order = new Order();
+
+            Product[] products = {productOne, productTwo};
+
+            foreach (var product in products)
+            {
+                var orderItem = new OrderItem()
+                {
+                    Product = productOne,
+                    Quantity = 2
+                };
+
+                order.OrderItems.Add(orderItem);
+            }
+
+            //Act and Assert
+            Assert.Throws<InvalidOperationException>(() => _orderService.PlaceOrder(order));
         }
     }
 }
