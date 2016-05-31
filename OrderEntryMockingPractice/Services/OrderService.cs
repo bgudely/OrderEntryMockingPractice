@@ -20,6 +20,8 @@ namespace OrderEntryMockingPractice.Services
         {
             ValidateOrder(order);
 
+            _orderFulfillmentService.Fulfill(order);
+
             var orderSummary = new OrderSummary();
 
             return orderSummary;
