@@ -47,7 +47,7 @@ namespace OrderEntryMockingPracticeTests
             {
                 var orderItem = new OrderItem()
                 {
-                    Product = productOne,
+                    Product = product,
                     Quantity = 2
                 };
 
