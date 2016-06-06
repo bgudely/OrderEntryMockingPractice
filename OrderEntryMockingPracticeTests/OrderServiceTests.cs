@@ -100,6 +100,21 @@ namespace OrderEntryMockingPracticeTests
             _orderFulfillmentService.Received().Fulfill(order);
         }
 
+        [Test]
+        public void OrderSummary_Contains_OrderFulfillmentConfirmationNumber()
+        {
+            //Arrange
+            var product = new Product() { Sku = "SomeProduct" };
+            var order = GenerateOneProductOrder(product);
+            _productRepository.IsInStock(product.Sku).Returns(true);
+
+            //Act
+            var orderSummary = _orderService.PlaceOrder(order);
+
+            //Assert
+            Assert.IsInstanceOf<string>(orderSummary.OrderNumber);
+        }
+
         private static Order GenerateOneProductOrder(Product product)
         {
             var orderItem = new OrderItem()
