@@ -12,6 +12,7 @@ namespace OrderEntryMockingPracticeTests
     {
         private OrderService _orderService;
         private Order _order;
+        private OrderConfirmation _orderConfirmation;
 
         private IProductRepository _productRepository;
         private IOrderFulfillmentService _orderFulfillmentService;
@@ -107,6 +108,7 @@ namespace OrderEntryMockingPracticeTests
             var product = new Product() { Sku = "SomeProduct" };
             var order = GenerateOneProductOrder(product);
             _productRepository.IsInStock(product.Sku).Returns(true);
+            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
 
             //Act
             var orderSummary = _orderService.PlaceOrder(order);
