@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
 using OrderEntryMockingPractice.Models;
@@ -238,16 +239,9 @@ namespace OrderEntryMockingPracticeTests
             return order;
         }
 
-        private decimal CalculateNetTotal(Order order)
+        private static decimal CalculateNetTotal(Order order)
         {
-            decimal netTotal = 0;
-
-            foreach (var orderItem in order.OrderItems)
-            {
-                netTotal += orderItem.Product.Price * orderItem.Quantity;
-            }
-
-            return netTotal;
+            return order.OrderItems.Sum(orderItem => orderItem.Product.Price * orderItem.Quantity);
         }
     }
 }

@@ -33,7 +33,8 @@ namespace OrderEntryMockingPractice.Services
             {
                 OrderNumber = orderConfirmation.OrderNumber,
                 OrderId = orderConfirmation.OrderId,
-                Taxes = _taxRateService.GetTaxEntries(customer.PostalCode, customer.Country)
+                Taxes = _taxRateService.GetTaxEntries(customer.PostalCode, customer.Country),
+                NetTotal = CalculateNetTotal(order)
             };
 
             return orderSummary;
@@ -86,6 +87,11 @@ namespace OrderEntryMockingPractice.Services
             }
 
             return true;
+        }
+
+        private decimal CalculateNetTotal(Order order)
+        {
+            return order.OrderItems.Sum(orderItem => orderItem.Product.Price * orderItem.Quantity);
         }
     }
 }
