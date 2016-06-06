@@ -12,6 +12,8 @@ namespace OrderEntryMockingPracticeTests
     {
         private OrderService _orderService;
         private OrderConfirmation _orderConfirmation;
+        private List<TaxEntry> _taxEntryList;
+        private Customer _customer;
 
         private IProductRepository _productRepository;
         private IOrderFulfillmentService _orderFulfillmentService;
@@ -24,9 +26,17 @@ namespace OrderEntryMockingPracticeTests
             _orderFulfillmentService = Substitute.For<IOrderFulfillmentService>();
             _taxRateService = Substitute.For<ITaxRateService>();
 
-            _orderConfirmation = new OrderConfirmation() { CustomerId = 42, OrderId = 12, OrderNumber = "OneTwoThree" };
-
             _orderService = new OrderService(_productRepository, _orderFulfillmentService, _taxRateService);
+
+            _orderConfirmation = new OrderConfirmation() { CustomerId = 42, OrderId = 12, OrderNumber = "OneTwoThree" };
+            _taxEntryList = new List<TaxEntry>()
+            {
+                new TaxEntry() { Description = "Default", Rate = (decimal) 0.1 },
+                new TaxEntry() { Description = "High", Rate = (decimal) 0.3 }
+            };
+            _customer = new Customer() { CustomerId = 2, PostalCode = "12345", Country = "USA"};
+
+            _taxRateService.GetTaxEntries(_customer.PostalCode, _customer.Country).Returns(_taxEntryList);
         }
 
         [Test]
