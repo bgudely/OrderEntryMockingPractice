@@ -11,7 +11,6 @@ namespace OrderEntryMockingPracticeTests
     public class OrderServiceTests
     {
         private OrderService _orderService;
-        private Order _order;
         private OrderConfirmation _orderConfirmation;
 
         private IProductRepository _productRepository;
@@ -23,7 +22,7 @@ namespace OrderEntryMockingPracticeTests
             _productRepository = Substitute.For<IProductRepository>();
             _orderFulfillmentService = Substitute.For<IOrderFulfillmentService>();
 
-            _orderConfirmation = new OrderConfirmation() {CustomerId = 42, OrderId = 12, OrderNumber = "OneTwoThree"};
+            _orderConfirmation = new OrderConfirmation() { CustomerId = 42, OrderId = 12, OrderNumber = "OneTwoThree" };
 
             _orderService = new OrderService(_productRepository, _orderFulfillmentService);
         }
@@ -40,12 +39,13 @@ namespace OrderEntryMockingPracticeTests
                 ProductId = 1,
                 Sku = "TestSKU"
             };
-            _order = GenerateOneProductOrder(product);
+             var order = GenerateOneProductOrder(product);
             _productRepository.IsInStock(product.Sku).Returns(true);
-            _orderFulfillmentService.Fulfill(_order).Returns(_orderConfirmation);
+            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
+
 
             //Act
-            var placedOrder = _orderService.PlaceOrder(_order);
+            var placedOrder = _orderService.PlaceOrder(order);
 
             //Assert
             Assert.IsInstanceOf<OrderSummary>(placedOrder);
