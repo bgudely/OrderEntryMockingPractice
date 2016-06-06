@@ -121,6 +121,22 @@ namespace OrderEntryMockingPracticeTests
             Assert.IsInstanceOf<string>(orderSummary.OrderNumber);
         }
 
+        [Test]
+        public void OrderSummary_Contains_OrderIDFromFulfillmentService()
+        {
+            //Arrange
+            var product = new Product() {Sku = "Something"};
+            var order = GenerateOneProductOrder(product);
+            _productRepository.IsInStock(product.Sku).Returns(true);
+            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
+
+            //Act
+            var orderSummary = _orderService.PlaceOrder(order);
+
+            //Assert
+            Assert.That(orderSummary.OrderId, Is.EqualTo(_orderConfirmation.OrderId));
+        }
+
         private static Order GenerateOneProductOrder(Product product)
         {
             var orderItem = new OrderItem()
