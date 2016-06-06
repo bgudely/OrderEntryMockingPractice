@@ -125,7 +125,7 @@ namespace OrderEntryMockingPracticeTests
         public void OrderSummary_Contains_OrderIDFromFulfillmentService()
         {
             //Arrange
-            var product = new Product() {Sku = "Something"};
+            var product = new Product() { Sku = "Something" };
             var order = GenerateOneProductOrder(product);
             _productRepository.IsInStock(product.Sku).Returns(true);
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);

@@ -22,7 +22,11 @@ namespace OrderEntryMockingPractice.Services
 
             var orderConfirmation = _orderFulfillmentService.Fulfill(order);
 
-            var orderSummary = new OrderSummary() { OrderNumber = orderConfirmation.OrderNumber };
+            var orderSummary = new OrderSummary()
+            {
+                OrderNumber = orderConfirmation.OrderNumber,
+                OrderId = orderConfirmation.OrderId
+            };
 
             return orderSummary;
         }
