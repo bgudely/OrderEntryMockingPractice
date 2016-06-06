@@ -23,6 +23,8 @@ namespace OrderEntryMockingPracticeTests
             _productRepository = Substitute.For<IProductRepository>();
             _orderFulfillmentService = Substitute.For<IOrderFulfillmentService>();
 
+            _orderConfirmation = new OrderConfirmation() {CustomerId = 42, OrderId = 12, OrderNumber = "OneTwoThree"};
+
             _orderService = new OrderService(_productRepository, _orderFulfillmentService);
         }
 
@@ -40,6 +42,7 @@ namespace OrderEntryMockingPracticeTests
             };
             _order = GenerateOneProductOrder(product);
             _productRepository.IsInStock(product.Sku).Returns(true);
+            _orderFulfillmentService.Fulfill(_order).Returns(_orderConfirmation);
 
             //Act
             var placedOrder = _orderService.PlaceOrder(_order);
@@ -93,6 +96,7 @@ namespace OrderEntryMockingPracticeTests
             var product = new Product() { Sku = "OutOfStock" };
             var order = GenerateOneProductOrder(product);
             _productRepository.IsInStock(product.Sku).Returns(true);
+            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
 
             //Act
             _orderService.PlaceOrder(order);

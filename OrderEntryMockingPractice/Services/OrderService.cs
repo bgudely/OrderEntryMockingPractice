@@ -20,9 +20,9 @@ namespace OrderEntryMockingPractice.Services
         {
             ValidateOrder(order);
 
-            _orderFulfillmentService.Fulfill(order);
+            var orderConfirmation = _orderFulfillmentService.Fulfill(order);
 
-            var orderSummary = new OrderSummary();
+            var orderSummary = new OrderSummary() { OrderNumber = orderConfirmation.OrderNumber };
 
             return orderSummary;
         }
