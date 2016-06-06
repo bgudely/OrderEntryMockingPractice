@@ -18,6 +18,7 @@ namespace OrderEntryMockingPracticeTests
         private IProductRepository _productRepository;
         private IOrderFulfillmentService _orderFulfillmentService;
         private ITaxRateService _taxRateService;
+        private ICustomerRepository _customerRepository;
 
         [SetUp]
         public void Init()
@@ -25,8 +26,9 @@ namespace OrderEntryMockingPracticeTests
             _productRepository = Substitute.For<IProductRepository>();
             _orderFulfillmentService = Substitute.For<IOrderFulfillmentService>();
             _taxRateService = Substitute.For<ITaxRateService>();
+            _customerRepository = Substitute.For<ICustomerRepository>();
 
-            _orderService = new OrderService(_productRepository, _orderFulfillmentService, _taxRateService);
+            _orderService = new OrderService(_productRepository, _orderFulfillmentService, _taxRateService, _customerRepository);
 
             _orderConfirmation = new OrderConfirmation() { CustomerId = 42, OrderId = 12, OrderNumber = "OneTwoThree" };
             _taxEntryList = new List<TaxEntry>()
@@ -37,6 +39,7 @@ namespace OrderEntryMockingPracticeTests
             _customer = new Customer() { CustomerId = 2, PostalCode = "12345", Country = "USA"};
 
             _taxRateService.GetTaxEntries(_customer.PostalCode, _customer.Country).Returns(_taxEntryList);
+            _customerRepository.Get(_customer.CustomerId.Value).Returns(_customer);
         }
 
         [Test]
@@ -155,6 +158,7 @@ namespace OrderEntryMockingPracticeTests
             //Arrange
             var product = new Product() {Sku = "Something"};
             var order = GenerateOneProductOrder(product);
+
             _productRepository.IsInStock(product.Sku).Returns(true);
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
 
@@ -165,7 +169,7 @@ namespace OrderEntryMockingPracticeTests
             Assert.IsInstanceOf<IEnumerable<TaxEntry>>(orderSummary.Taxes);
         }
 
-        private static Order GenerateOneProductOrder(Product product)
+        private Order GenerateOneProductOrder(Product product)
         {
             var orderItem = new OrderItem()
             {
@@ -177,7 +181,8 @@ namespace OrderEntryMockingPracticeTests
 
             var order = new Order()
             {
-                OrderItems = orderItemsList
+                OrderItems = orderItemsList,
+                CustomerId = _customer.CustomerId
             };
 
             return order;
