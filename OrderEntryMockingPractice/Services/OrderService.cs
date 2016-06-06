@@ -9,11 +9,13 @@ namespace OrderEntryMockingPractice.Services
     {
         private readonly IProductRepository _productRepository;
         private readonly IOrderFulfillmentService _orderFulfillmentService;
+        private readonly ITaxRateService _taxRateService;
 
-        public OrderService(IProductRepository productRepository, IOrderFulfillmentService orderFulfillmentService)
+        public OrderService(IProductRepository productRepository, IOrderFulfillmentService orderFulfillmentService, ITaxRateService taxRateService)
         {
             _productRepository = productRepository;
             _orderFulfillmentService = orderFulfillmentService;
+            _taxRateService = taxRateService;
         }
 
         public OrderSummary PlaceOrder(Order order)

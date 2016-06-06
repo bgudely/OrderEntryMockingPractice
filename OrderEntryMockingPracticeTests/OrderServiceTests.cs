@@ -15,16 +15,18 @@ namespace OrderEntryMockingPracticeTests
 
         private IProductRepository _productRepository;
         private IOrderFulfillmentService _orderFulfillmentService;
+        private ITaxRateService _taxRateService;
 
         [SetUp]
         public void Init()
         {
             _productRepository = Substitute.For<IProductRepository>();
             _orderFulfillmentService = Substitute.For<IOrderFulfillmentService>();
+            _taxRateService = Substitute.For<ITaxRateService>();
 
             _orderConfirmation = new OrderConfirmation() { CustomerId = 42, OrderId = 12, OrderNumber = "OneTwoThree" };
 
-            _orderService = new OrderService(_productRepository, _orderFulfillmentService);
+            _orderService = new OrderService(_productRepository, _orderFulfillmentService, _taxRateService);
         }
 
         [Test]
@@ -135,6 +137,22 @@ namespace OrderEntryMockingPracticeTests
 
             //Assert
             Assert.That(orderSummary.OrderId, Is.EqualTo(_orderConfirmation.OrderId));
+        }
+
+        [Test]
+        public void OrderSummary_Contains_TaxesForOrder()
+        {
+            //Arrange
+            var product = new Product() {Sku = "Something"};
+            var order = GenerateOneProductOrder(product);
+            _productRepository.IsInStock(product.Sku).Returns(true);
+            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
+
+            //Act
+            var orderSummary = _orderService.PlaceOrder(order);
+
+            //Assert
+            Assert.IsInstanceOf<IEnumerable<TaxEntry>>(orderSummary.Taxes);
         }
 
         private static Order GenerateOneProductOrder(Product product)
