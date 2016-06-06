@@ -169,12 +169,37 @@ namespace OrderEntryMockingPracticeTests
             Assert.IsInstanceOf<IEnumerable<TaxEntry>>(orderSummary.Taxes);
         }
 
+        [Test]
+        public void OrderSummary_Contains_CalculatedNetTotal()
+        {
+            //Arrange
+            var product = new Product()
+            {
+                Description = "A cleaning product by Billy Mays",
+                Name = "OxyClean",
+                Price = 5,
+                Sku = "BILLYMAYSHERE"
+            };
+            var order = GenerateOneProductOrder(product);
+
+            _productRepository.IsInStock(product.Sku).Returns(true);
+            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
+
+            //Act
+            var orderSummary = _orderService.PlaceOrder(order);
+            var expectedNetTotal = CalculateNetTotal(order);
+
+            //Assert
+            Assert.That(orderSummary.NetTotal, Is.EqualTo(expectedNetTotal));
+
+        }
+
         private Order GenerateOneProductOrder(Product product)
         {
             var orderItem = new OrderItem()
             {
                 Product = product,
-                Quantity = 1
+                Quantity = 2
             };
 
             var orderItemsList = new List<OrderItem> { orderItem };
@@ -211,6 +236,18 @@ namespace OrderEntryMockingPracticeTests
             }
 
             return order;
+        }
+
+        private decimal CalculateNetTotal(Order order)
+        {
+            decimal netTotal = 0;
+
+            foreach (var orderItem in order.OrderItems)
+            {
+                netTotal += orderItem.Product.Price * orderItem.Quantity;
+            }
+
+            return netTotal;
         }
     }
 }

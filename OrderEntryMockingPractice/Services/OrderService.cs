@@ -12,7 +12,8 @@ namespace OrderEntryMockingPractice.Services
         private readonly ITaxRateService _taxRateService;
         private readonly ICustomerRepository _customerRepository;
 
-        public OrderService(IProductRepository productRepository, IOrderFulfillmentService orderFulfillmentService, ITaxRateService taxRateService, ICustomerRepository customerRepository)
+        public OrderService(IProductRepository productRepository, IOrderFulfillmentService orderFulfillmentService, 
+                            ITaxRateService taxRateService, ICustomerRepository customerRepository)
         {
             _productRepository = productRepository;
             _orderFulfillmentService = orderFulfillmentService;
