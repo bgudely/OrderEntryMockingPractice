@@ -49,18 +49,7 @@ namespace OrderEntryMockingPracticeTests
         public void ValidOrderReturnsOrderSummary()
         {
             //Arrange
-            var product = new Product()
-            {
-                Name = "Test Product",
-                Description = "A test Product",
-                Price = 10,
-                ProductId = 1,
-                Sku = "TestSKU"
-            };
-            var order = GenerateOrderFromProducts(new[] { product });
-
-            _productRepository.IsInStock(product.Sku).Returns(true);
-            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
+            var order = GenerateValidOneProductOrder();
 
             //Act
             var placedOrder = _orderService.PlaceOrder(order);
@@ -113,11 +102,7 @@ namespace OrderEntryMockingPracticeTests
         public void ValidOrderSubmitsOrderToOrderFullfillmentService()
         {
             //Arrange
-            var product = new Product() { Sku = "OutOfStock" };
-            var order = GenerateOrderFromProducts(new[] { product });
-
-            _productRepository.IsInStock(product.Sku).Returns(true);
-            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
+            var order = GenerateValidOneProductOrder();
 
             //Act
             _orderService.PlaceOrder(order);
@@ -130,11 +115,7 @@ namespace OrderEntryMockingPracticeTests
         public void OrderSummaryContainsOrderFulfillmentConfirmationNumber()
         {
             //Arrange
-            var product = new Product() { Sku = "SomeProduct" };
-            var order = GenerateOrderFromProducts(new[] { product });
-
-            _productRepository.IsInStock(product.Sku).Returns(true);
-            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
+            var order = GenerateValidOneProductOrder();
 
             //Act
             var orderSummary = _orderService.PlaceOrder(order);
@@ -144,14 +125,10 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void OrderSummaryContainsOrderIDFromFulfillmentService()
+        public void OrderSummaryContainsOrderIdFromFulfillmentService()
         {
             //Arrange
-            var product = new Product() { Sku = "Something" };
-            var order = GenerateOrderFromProducts(new[] { product });
-
-            _productRepository.IsInStock(product.Sku).Returns(true);
-            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
+            var order = GenerateValidOneProductOrder();
 
             //Act
             var orderSummary = _orderService.PlaceOrder(order);
@@ -164,11 +141,7 @@ namespace OrderEntryMockingPracticeTests
         public void OrderSummaryContainsTaxesForOrder()
         {
             //Arrange
-            var product = new Product() {Sku = "Something"};
-            var order = GenerateOrderFromProducts(new[] { product });
-
-            _productRepository.IsInStock(product.Sku).Returns(true);
-            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
+            var order = GenerateValidOneProductOrder();
 
             //Act
             var orderSummary = _orderService.PlaceOrder(order);
@@ -181,17 +154,7 @@ namespace OrderEntryMockingPracticeTests
         public void OrderSummaryContainsCalculatedNetTotal()
         {
             //Arrange
-            var product = new Product()
-            {
-                Description = "A cleaning product by Billy Mays",
-                Name = "OxyClean",
-                Price = 5,
-                Sku = "BILLYMAYSHERE"
-            };
-            var order = GenerateOrderFromProducts(new[] { product });
-
-            _productRepository.IsInStock(product.Sku).Returns(true);
-            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
+            var order = GenerateValidOneProductOrder();
 
             //Act
             var orderSummary = _orderService.PlaceOrder(order);
@@ -206,18 +169,7 @@ namespace OrderEntryMockingPracticeTests
         public void OrderSummaryContainsCalculatedOrderTotal()
         {
             //Arrange
-            var product = new Product()
-            {
-                Description = "A cleaning product by Billy Mays",
-                Name = "OxyClean",
-                Price = 5,
-                Sku = "BILLYMAYSHERE"
-            };
-            var order = GenerateOrderFromProducts(new[] { product });
-
-            _productRepository.IsInStock(product.Sku).Returns(true);
-            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
-            _taxRateService.GetTaxEntries(_customer.PostalCode, _customer.Country).Returns(_taxEntryList);
+            var order = GenerateValidOneProductOrder();
 
             var taxRate = _taxEntryList.FirstOrDefault(entry => entry.Description == "Default");
 
@@ -233,18 +185,7 @@ namespace OrderEntryMockingPracticeTests
         public void ValidOrderSendsConfirmationEmailToCustomer()
         {
             //Arrange
-            var product = new Product()
-            {
-                Name = "Test Product",
-                Description = "A test Product",
-                Price = 10,
-                ProductId = 1,
-                Sku = "TestSKU"
-            };
-            var order = GenerateOrderFromProducts(new[] { product });
-
-            _productRepository.IsInStock(product.Sku).Returns(true);
-            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
+            var order = GenerateValidOneProductOrder();
 
             //Act
             var orderSummary = _orderService.PlaceOrder(order);
@@ -273,6 +214,24 @@ namespace OrderEntryMockingPracticeTests
                 OrderItems = orderItemList,
                 CustomerId = _customer.CustomerId
             };
+
+            return order;
+        }
+
+        private Order GenerateValidOneProductOrder()
+        {
+            var product = new Product()
+            {
+                Name = "Test Product",
+                Description = "A test Product",
+                Price = 10,
+                ProductId = 1,
+                Sku = "TestSKU"
+            };
+            var order = GenerateOrderFromProducts(new[] { product });
+
+            _productRepository.IsInStock(product.Sku).Returns(true);
+            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
 
             return order;
         }
