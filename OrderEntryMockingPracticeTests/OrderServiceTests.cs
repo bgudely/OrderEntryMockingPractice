@@ -217,7 +217,7 @@ namespace OrderEntryMockingPracticeTests
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
             _taxRateService.GetTaxEntries(_customer.PostalCode, _customer.Country).Returns(_taxEntryList);
 
-            var taxRate = _taxEntryList.FirstOrDefault(entry => entry.Description == "Deafult");
+            var taxRate = _taxEntryList.FirstOrDefault(entry => entry.Description == "Default");
 
             //Act
             var orderSummary = _orderService.PlaceOrder(order);

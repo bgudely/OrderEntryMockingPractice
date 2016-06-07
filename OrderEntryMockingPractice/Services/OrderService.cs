@@ -26,15 +26,20 @@ namespace OrderEntryMockingPractice.Services
             ValidateOrder(order);
 
             var orderConfirmation = _orderFulfillmentService.Fulfill(order);
-
+        
             var customer = _customerRepository.Get(order.CustomerId.Value);
+
+            var netTotal = CalculateNetTotal(order);
+
+            var taxRate = _taxRateService.GetTaxEntries(customer.PostalCode, customer.Country).FirstOrDefault(rate => rate.Description == "Default");
 
             var orderSummary = new OrderSummary()
             {
                 OrderNumber = orderConfirmation.OrderNumber,
                 OrderId = orderConfirmation.OrderId,
                 Taxes = _taxRateService.GetTaxEntries(customer.PostalCode, customer.Country),
-                NetTotal = CalculateNetTotal(order)
+                NetTotal = netTotal,
+                Total = netTotal * (1 + taxRate.Rate)
             };
 
             return orderSummary;
