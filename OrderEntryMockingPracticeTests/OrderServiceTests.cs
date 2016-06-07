@@ -70,7 +70,9 @@ namespace OrderEntryMockingPracticeTests
         public void DuplicateSkus_ThrowsException()
         {
             //Arrange
-            var order = GenerateDuplicateSkuOrder();
+            var product = new Product() {Sku = "123456"};
+            var products = new [] {product, product};
+            var order = GenerateOrderFromProducts(products);
 
             //Act and Assert
             Assert.Throws<InvalidOperationException>(() => _orderService.PlaceOrder(order));
@@ -80,8 +82,9 @@ namespace OrderEntryMockingPracticeTests
         public void ProductOutOfStock_ThrowsException()
         {
             //Arrange
-            var product = new Product(){ Sku = "OutOfStock" };
+            var product = new Product(){ Name = "Out Of Stock Product" };
             var order = GenerateOrderFromProducts(new []{ product });
+
             _productRepository.IsInStock(product.Sku).Returns(false);
 
             //Act and Assert
@@ -92,10 +95,9 @@ namespace OrderEntryMockingPracticeTests
         public void DuplicateSkuAndOutOfStock_Returns_AllValidationReasons()
         {
             //Arrange
-            var order = GenerateDuplicateSkuOrder();
-            var product = new Product(){ Sku = "OutOfStock" };
-            var orderItem = new OrderItem() { Product = product, Quantity = 1 };
-            order.OrderItems.Add(orderItem);
+            var product = new Product() { Sku = "123456" };
+            var products = new[] { product, product };
+            var order = GenerateOrderFromProducts(products);
 
             _productRepository.IsInStock(product.Sku).Returns(false);
 
@@ -110,6 +112,7 @@ namespace OrderEntryMockingPracticeTests
             //Arrange
             var product = new Product() { Sku = "OutOfStock" };
             var order = GenerateOrderFromProducts(new[] { product });
+
             _productRepository.IsInStock(product.Sku).Returns(true);
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
 
@@ -126,6 +129,7 @@ namespace OrderEntryMockingPracticeTests
             //Arrange
             var product = new Product() { Sku = "SomeProduct" };
             var order = GenerateOrderFromProducts(new[] { product });
+
             _productRepository.IsInStock(product.Sku).Returns(true);
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
 
@@ -142,6 +146,7 @@ namespace OrderEntryMockingPracticeTests
             //Arrange
             var product = new Product() { Sku = "Something" };
             var order = GenerateOrderFromProducts(new[] { product });
+
             _productRepository.IsInStock(product.Sku).Returns(true);
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
 
@@ -158,6 +163,7 @@ namespace OrderEntryMockingPracticeTests
             //Arrange
             var product = new Product() {Sku = "Something"};
             var order = GenerateOrderFromProducts(new[] { product });
+
             _productRepository.IsInStock(product.Sku).Returns(true);
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
 
@@ -213,31 +219,6 @@ namespace OrderEntryMockingPracticeTests
                 OrderItems = orderItemList,
                 CustomerId = _customer.CustomerId
             };
-
-            return order;
-        }
-
-        private static Order GenerateDuplicateSkuOrder()
-        {
-            var productOne = new Product()
-            {
-                Sku = "123456"
-            };
-            var productTwo = productOne;
-            var order = new Order();
-
-            Product[] products = { productOne, productTwo };
-
-            foreach (var product in products)
-            {
-                var orderItem = new OrderItem()
-                {
-                    Product = product,
-                    Quantity = 2
-                };
-
-                order.OrderItems.Add(orderItem);
-            }
 
             return order;
         }
