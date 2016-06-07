@@ -35,11 +35,13 @@ namespace OrderEntryMockingPractice.Services
 
             var taxRate = _taxRateService.GetTaxEntries(customer.PostalCode, customer.Country).FirstOrDefault(rate => rate.Description == "Default");
 
+            _emailService.SendOrderConfirmationEmail(orderConfirmation.CustomerId, orderConfirmation.OrderId);
+
             var orderSummary = new OrderSummary()
             {
                 OrderNumber = orderConfirmation.OrderNumber,
                 OrderId = orderConfirmation.OrderId,
-                CustomerId = customer.CustomerId.Value,
+                CustomerId = orderConfirmation.CustomerId,
                 Taxes = _taxRateService.GetTaxEntries(customer.PostalCode, customer.Country),
                 NetTotal = netTotal,
                 Total = netTotal * (1 + taxRate.Rate)
