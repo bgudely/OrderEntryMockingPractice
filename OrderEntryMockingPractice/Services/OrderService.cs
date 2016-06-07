@@ -89,7 +89,7 @@ namespace OrderEntryMockingPractice.Services
             return true;
         }
 
-        private decimal CalculateNetTotal(Order order)
+        private static decimal CalculateNetTotal(Order order)
         {
             return order.OrderItems.Sum(orderItem => orderItem.Product.Price * orderItem.Quantity);
         }

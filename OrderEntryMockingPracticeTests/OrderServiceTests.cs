@@ -55,10 +55,9 @@ namespace OrderEntryMockingPracticeTests
                 ProductId = 1,
                 Sku = "TestSKU"
             };
-             var order = GenerateOneProductOrder(product);
+            var order = GenerateOrderFromProducts(new[] { product });
             _productRepository.IsInStock(product.Sku).Returns(true);
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
-
 
             //Act
             var placedOrder = _orderService.PlaceOrder(order);
@@ -82,7 +81,7 @@ namespace OrderEntryMockingPracticeTests
         {
             //Arrange
             var product = new Product(){ Sku = "OutOfStock" };
-            var order = GenerateOneProductOrder(product);
+            var order = GenerateOrderFromProducts(new []{ product });
             _productRepository.IsInStock(product.Sku).Returns(false);
 
             //Act and Assert
@@ -110,7 +109,7 @@ namespace OrderEntryMockingPracticeTests
         {
             //Arrange
             var product = new Product() { Sku = "OutOfStock" };
-            var order = GenerateOneProductOrder(product);
+            var order = GenerateOrderFromProducts(new[] { product });
             _productRepository.IsInStock(product.Sku).Returns(true);
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
 
@@ -126,7 +125,7 @@ namespace OrderEntryMockingPracticeTests
         {
             //Arrange
             var product = new Product() { Sku = "SomeProduct" };
-            var order = GenerateOneProductOrder(product);
+            var order = GenerateOrderFromProducts(new[] { product });
             _productRepository.IsInStock(product.Sku).Returns(true);
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
 
@@ -142,7 +141,7 @@ namespace OrderEntryMockingPracticeTests
         {
             //Arrange
             var product = new Product() { Sku = "Something" };
-            var order = GenerateOneProductOrder(product);
+            var order = GenerateOrderFromProducts(new[] { product });
             _productRepository.IsInStock(product.Sku).Returns(true);
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
 
@@ -158,8 +157,7 @@ namespace OrderEntryMockingPracticeTests
         {
             //Arrange
             var product = new Product() {Sku = "Something"};
-            var order = GenerateOneProductOrder(product);
-
+            var order = GenerateOrderFromProducts(new[] { product });
             _productRepository.IsInStock(product.Sku).Returns(true);
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
 
@@ -181,7 +179,7 @@ namespace OrderEntryMockingPracticeTests
                 Price = 5,
                 Sku = "BILLYMAYSHERE"
             };
-            var order = GenerateOneProductOrder(product);
+            var order = GenerateOrderFromProducts(new[] { product });
 
             _productRepository.IsInStock(product.Sku).Returns(true);
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
@@ -195,19 +193,24 @@ namespace OrderEntryMockingPracticeTests
 
         }
 
-        private Order GenerateOneProductOrder(Product product)
+        private Order GenerateOrderFromProducts(Product[] products)
         {
-            var orderItem = new OrderItem()
-            {
-                Product = product,
-                Quantity = 2
-            };
+            var orderItemList = new List<OrderItem>();
 
-            var orderItemsList = new List<OrderItem> { orderItem };
+            foreach (var product in products)
+            {
+                var orderItem = new OrderItem()
+                {
+                    Product = product,
+                    Quantity = 3
+                };
+
+                orderItemList.Add(orderItem);
+            }
 
             var order = new Order()
             {
-                OrderItems = orderItemsList,
+                OrderItems = orderItemList,
                 CustomerId = _customer.CustomerId
             };
 
