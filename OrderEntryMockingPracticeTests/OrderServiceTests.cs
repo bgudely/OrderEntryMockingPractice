@@ -20,6 +20,7 @@ namespace OrderEntryMockingPracticeTests
         private IOrderFulfillmentService _orderFulfillmentService;
         private ITaxRateService _taxRateService;
         private ICustomerRepository _customerRepository;
+        private IEmailService _emailService;
 
         [SetUp]
         public void Init()
@@ -28,8 +29,9 @@ namespace OrderEntryMockingPracticeTests
             _orderFulfillmentService = Substitute.For<IOrderFulfillmentService>();
             _taxRateService = Substitute.For<ITaxRateService>();
             _customerRepository = Substitute.For<ICustomerRepository>();
+            _emailService = Substitute.For<IEmailService>();
 
-            _orderService = new OrderService(_productRepository, _orderFulfillmentService, _taxRateService, _customerRepository);
+            _orderService = new OrderService(_productRepository, _orderFulfillmentService, _taxRateService, _customerRepository, _emailService);
 
             _orderConfirmation = new OrderConfirmation() { CustomerId = 42, OrderId = 12, OrderNumber = "OneTwoThree" };
             _taxEntryList = new List<TaxEntry>()
@@ -230,7 +232,25 @@ namespace OrderEntryMockingPracticeTests
         [Test]
         public void ValidOrderSendsConfirmationEmailToCustomer()
         {
-            
+            //Arrange
+            var product = new Product()
+            {
+                Name = "Test Product",
+                Description = "A test Product",
+                Price = 10,
+                ProductId = 1,
+                Sku = "TestSKU"
+            };
+            var order = GenerateOrderFromProducts(new[] { product });
+
+            _productRepository.IsInStock(product.Sku).Returns(true);
+            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
+
+            //Act
+            var orderSummary = _orderService.PlaceOrder(order);
+
+            //Assert
+            _emailService.Received().SendOrderConfirmationEmail(orderSummary.CustomerId, orderSummary.OrderId);
         }
 
         private Order GenerateOrderFromProducts(Product[] products)

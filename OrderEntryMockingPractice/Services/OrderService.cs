@@ -11,14 +11,16 @@ namespace OrderEntryMockingPractice.Services
         private readonly IOrderFulfillmentService _orderFulfillmentService;
         private readonly ITaxRateService _taxRateService;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IEmailService _emailService;
 
         public OrderService(IProductRepository productRepository, IOrderFulfillmentService orderFulfillmentService, 
-                            ITaxRateService taxRateService, ICustomerRepository customerRepository)
+                            ITaxRateService taxRateService, ICustomerRepository customerRepository, IEmailService emailService)
         {
             _productRepository = productRepository;
             _orderFulfillmentService = orderFulfillmentService;
             _taxRateService = taxRateService;
             _customerRepository = customerRepository;
+            _emailService = emailService;
         }
 
         public OrderSummary PlaceOrder(Order order)
@@ -37,6 +39,7 @@ namespace OrderEntryMockingPractice.Services
             {
                 OrderNumber = orderConfirmation.OrderNumber,
                 OrderId = orderConfirmation.OrderId,
+                CustomerId = customer.CustomerId.Value,
                 Taxes = _taxRateService.GetTaxEntries(customer.PostalCode, customer.Country),
                 NetTotal = netTotal,
                 Total = netTotal * (1 + taxRate.Rate)
