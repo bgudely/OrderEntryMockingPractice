@@ -13,8 +13,8 @@ namespace OrderEntryMockingPractice.Services
         private readonly ICustomerRepository _customerRepository;
         private readonly IEmailService _emailService;
 
-        public OrderService(IProductRepository productRepository, IOrderFulfillmentService orderFulfillmentService, 
-                            ITaxRateService taxRateService, ICustomerRepository customerRepository, IEmailService emailService)
+        public OrderService(IProductRepository productRepository, IOrderFulfillmentService orderFulfillmentService,
+            ITaxRateService taxRateService, ICustomerRepository customerRepository, IEmailService emailService)
         {
             _productRepository = productRepository;
             _orderFulfillmentService = orderFulfillmentService;
@@ -28,23 +28,24 @@ namespace OrderEntryMockingPractice.Services
             ValidateOrder(order);
 
             var orderConfirmation = _orderFulfillmentService.Fulfill(order);
-        
+
             var customer = _customerRepository.Get(order.CustomerId.Value);
 
             var netTotal = CalculateNetTotal(order);
 
-            var taxRate = _taxRateService.GetTaxEntries(customer.PostalCode, customer.Country).FirstOrDefault(rate => rate.Description == "Default");
+            var taxRate = _taxRateService.GetTaxEntries(customer.PostalCode, customer.Country)
+                .FirstOrDefault(rate => rate.Description == "Default");
 
             _emailService.SendOrderConfirmationEmail(orderConfirmation.CustomerId, orderConfirmation.OrderId);
 
-            var orderSummary = new OrderSummary()
+            var orderSummary = new OrderSummary
             {
                 OrderNumber = orderConfirmation.OrderNumber,
                 OrderId = orderConfirmation.OrderId,
                 CustomerId = orderConfirmation.CustomerId,
                 Taxes = _taxRateService.GetTaxEntries(customer.PostalCode, customer.Country),
                 NetTotal = netTotal,
-                Total = netTotal * (1 + taxRate.Rate)
+                Total = netTotal*(1 + taxRate.Rate)
             };
 
             return orderSummary;
@@ -71,7 +72,7 @@ namespace OrderEntryMockingPractice.Services
 
             if (messages.Any())
             {
-                throw new InvalidOperationException(String.Join(", ", messages));
+                throw new InvalidOperationException(string.Join(", ", messages));
             }
         }
 
@@ -101,7 +102,7 @@ namespace OrderEntryMockingPractice.Services
 
         private static decimal CalculateNetTotal(Order order)
         {
-            return order.OrderItems.Sum(orderItem => orderItem.Product.Price * orderItem.Quantity);
+            return order.OrderItems.Sum(orderItem => orderItem.Product.Price*orderItem.Quantity);
         }
     }
 }
