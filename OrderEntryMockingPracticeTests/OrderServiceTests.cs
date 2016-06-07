@@ -44,7 +44,7 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void ValidOrder_Returns_OrderSummary()
+        public void ValidOrderReturnsOrderSummary()
         {
             //Arrange
             var product = new Product()
@@ -68,7 +68,7 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void DuplicateSkus_ThrowsException()
+        public void DuplicateSkusThrowsException()
         {
             //Arrange
             var product = new Product() {Sku = "123456"};
@@ -80,7 +80,7 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void ProductOutOfStock_ThrowsException()
+        public void ProductOutOfStockThrowsException()
         {
             //Arrange
             var product = new Product(){ Name = "Out Of Stock Product" };
@@ -93,7 +93,7 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void DuplicateSkuAndOutOfStock_Returns_AllValidationReasons()
+        public void DuplicateSkuAndOutOfStockReturnsAllValidationReasons()
         {
             //Arrange
             var product = new Product() { Sku = "123456" };
@@ -108,7 +108,7 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void ValidOrder_SubmitsOrder_ToOrderFullfillmentService()
+        public void ValidOrderSubmitsOrderToOrderFullfillmentService()
         {
             //Arrange
             var product = new Product() { Sku = "OutOfStock" };
@@ -125,7 +125,7 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void OrderSummary_Contains_OrderFulfillmentConfirmationNumber()
+        public void OrderSummaryContainsOrderFulfillmentConfirmationNumber()
         {
             //Arrange
             var product = new Product() { Sku = "SomeProduct" };
@@ -142,7 +142,7 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void OrderSummary_Contains_OrderIDFromFulfillmentService()
+        public void OrderSummaryContainsOrderIDFromFulfillmentService()
         {
             //Arrange
             var product = new Product() { Sku = "Something" };
@@ -159,7 +159,7 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void OrderSummary_Contains_TaxesForOrder()
+        public void OrderSummaryContainsTaxesForOrder()
         {
             //Arrange
             var product = new Product() {Sku = "Something"};
@@ -176,7 +176,7 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void OrderSummary_Contains_CalculatedNetTotal()
+        public void OrderSummaryContainsCalculatedNetTotal()
         {
             //Arrange
             var product = new Product()
@@ -201,7 +201,7 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void OrderSummary_Contains_CalculatedOrderTotal()
+        public void OrderSummaryContainsCalculatedOrderTotal()
         {
             //Arrange
             var product = new Product()
@@ -223,7 +223,14 @@ namespace OrderEntryMockingPracticeTests
             var orderSummary = _orderService.PlaceOrder(order);
             var expectedOrderTotal = orderSummary.NetTotal * (1 + taxRate.Rate);
 
+            //Assert
             Assert.That(orderSummary.Total, Is.EqualTo(expectedOrderTotal));
+        }
+
+        [Test]
+        public void ValidOrderSendsConfirmationEmailToCustomer()
+        {
+            
         }
 
         private Order GenerateOrderFromProducts(Product[] products)
