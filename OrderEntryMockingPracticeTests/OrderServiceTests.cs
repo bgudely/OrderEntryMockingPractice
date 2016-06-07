@@ -34,8 +34,8 @@ namespace OrderEntryMockingPracticeTests
             _orderConfirmation = new OrderConfirmation() { CustomerId = 42, OrderId = 12, OrderNumber = "OneTwoThree" };
             _taxEntryList = new List<TaxEntry>()
             {
-                new TaxEntry() { Description = "Default", Rate = (decimal) 0.1 },
-                new TaxEntry() { Description = "High", Rate = (decimal) 0.3 }
+                new TaxEntry() { Description = "Default", Rate = (decimal) 0.2 },
+                new TaxEntry() { Description = "High", Rate = (decimal) 0.5 }
             };
             _customer = new Customer() { CustomerId = 2, PostalCode = "12345", Country = "USA"};
 
@@ -56,6 +56,7 @@ namespace OrderEntryMockingPracticeTests
                 Sku = "TestSKU"
             };
             var order = GenerateOrderFromProducts(new[] { product });
+
             _productRepository.IsInStock(product.Sku).Returns(true);
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
 
@@ -197,6 +198,32 @@ namespace OrderEntryMockingPracticeTests
             //Assert
             Assert.That(orderSummary.NetTotal, Is.EqualTo(expectedNetTotal));
 
+        }
+
+        [Test]
+        public void OrderSummary_Contains_CalculatedOrderTotal()
+        {
+            //Arrange
+            var product = new Product()
+            {
+                Description = "A cleaning product by Billy Mays",
+                Name = "OxyClean",
+                Price = 5,
+                Sku = "BILLYMAYSHERE"
+            };
+            var order = GenerateOrderFromProducts(new[] { product });
+
+            _productRepository.IsInStock(product.Sku).Returns(true);
+            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
+            _taxRateService.GetTaxEntries(_customer.PostalCode, _customer.Country).Returns(_taxEntryList);
+
+            var taxRate = _taxEntryList.FirstOrDefault(entry => entry.Description == "Deafult");
+
+            //Act
+            var orderSummary = _orderService.PlaceOrder(order);
+            var expectedOrderTotal = orderSummary.NetTotal * (1 + taxRate.Rate);
+
+            Assert.That(orderSummary.Total, Is.EqualTo(expectedOrderTotal));
         }
 
         private Order GenerateOrderFromProducts(Product[] products)
